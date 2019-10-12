@@ -22,3 +22,8 @@ The next texts were selected for processing:
 - [Miguel de Cervantes Saavedra Don Quijote de la Mancha](https://mek.oszk.hu/09900/09901/index.phtml)
 - [Alexandre Dumas A névtelen kapitány](https://mek.oszk.hu/17800/17844/index.phtml)
 - [Jaroslav Hašek Infanteriszt Svejk](https://mek.oszk.hu/19200/19226/index.phtml)
+
+### Files
+* custom_stopwords.txt - not relevant words, usually foreign, mistakes so on. Need to be excluded from index.
+* excluded_words.txt - words which should not be part of the index because, for example, user already knows them.
+* lemmas.csv - forms of one word.
