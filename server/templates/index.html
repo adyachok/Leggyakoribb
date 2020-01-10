@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <title>Szotar</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<!--        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>-->
+<!--        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.core.min.js"></script>
+        <style>
+            .progress_bar {
+                height: 1rem;
+                margin-top: 3rem;
+                padding-top: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+    <div class="list-group">
+        {% for item in result %}
+        <button type="button" class="list-group-item list-group-item-action z-depth-3 {% if item.id in progress %}disabled amber lighten-4{% endif %}" id="{{ item.id }}" data-words-list="{{item.words_list_id}}" onclick="processState(this)">
+            <div class="d-flex w-100 justify-content-between">
+                <h3 class="mb-1">{{ item.hu_szo }}</h3>
+                <small data-name="date_of_fulfilment">{% if item.id in progress %}{{ progress[item.id] }}{% endif %}</small>
+            </div>
+            <p class="flow-text">{{ item.ua_szo }}</p>
+            <small style="color: lightsteelblue;">{{ item.id }}</small>
+        </button>
+        {% endfor %}
+    </div>
+
+    <!--    FAB starts -->
+    <div class="fixed-action-btn">
+      <a class="btn-floating btn-large red">
+        <i class="large material-icons">menu</i>
+      </a>
+      <ul>
+        <li><a class="btn-floating red"><i class="material-icons" onclick="synchronize();">sync</i></a></li>
+        <li><a class="btn-floating yellow darken-1"><i class="material-icons">navigate_next</i></a></li>
+        <li><a class="btn-floating green"><i class="material-icons">navigate_before</i></a></li>
+        <li><a class="btn-floating green modal-trigger" onclick="triggerModal('modal_progress')" href="#modal_progress"><i class="material-icons">explore</i></a></li>
+      </ul>
+    </div>
+    <!--    FAB ends -->
+
+    <!--    Mddal starts  -->
+     <div id="modal_progress" class="modal" style="max-height: 36%;">
+        <div class="modal-content">
+          <h4 class="center-align">Learning progress</h4>
+
+          <div>
+              <h5>Collection learning progress:</h5>
+              <div class="progress progress_bar">
+                  <div class="determinate" style="width: 70%"></div>
+                  <p>70 %</p>
+              </div>
+          </div>
+
+          <div>
+              <h5>Collection learning progress:</h5>
+              <div class="progress progress_bar">
+                  <div class="determinate" style="width: 70%"></div>
+                  <p>70 %</p>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-close waves-effect waves-green btn-flat"> Ok </a>
+        </div>
+      </div>
+     <!--    Mddal ends  -->
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.fixed-action-btn').floatingActionButton();
+          });
+
+        var processed_ids = {};
+
+        function processState(el) {
+            var date_of_fulfilment = moment();
+            var saved = save_processed_word_id(el.id, date_of_fulfilment);
+            if (saved) {
+                el.classList.add("list-group-item-success");
+                update_date_of_fulfilment(el, date_of_fulfilment);
+            } else {
+                el.classList.remove("list-group-item-success");
+                remove_date_of_fulfilment(el);
+            }
+        }
+
+        function save_processed_word_id(id, date_of_fulfilment) {
+            var saved = true;
+            if (processed_ids.hasOwnProperty(id)) {
+                delete processed_ids[id];
+                saved = false;
+            } else {
+                processed_ids[id] = date_of_fulfilment;
+            }
+            return saved;
+        }
+
+        function update_date_of_fulfilment(el, date_of_fulfilment) {
+            var small = $(el).find('[data-name="date_of_fulfilment"]')[0];
+            $(small).text(date_of_fulfilment.format('DD.MM.YY, H:mm:ss'));
+        }
+
+        function remove_date_of_fulfilment(el) {
+            var small = $(el).find('[data-name="date_of_fulfilment"]')[0];
+            $(small).text('');
+        }
+
+        function synchronize() {
+            if (_.isEmpty(processed_ids)) {
+                console.log('No word selected');
+                return;
+            }
+            var sync_data = {};
+            var learned_words = {};
+            var words_list_id;
+            for (var key in processed_ids) {
+                learned_words[key] = processed_ids[key].unix();
+                // check if words list id is the same
+                var el_wl_id = $("#"+ key).attr('data-words-list');
+                if (words_list_id === undefined) {
+                    words_list_id = el_wl_id;
+                } else if (words_list_id !== el_wl_id) {
+                    console.log('Words list ids are different!')
+                    return;
+                }
+            }
+            sync_data['learned_words'] = learned_words;
+            sync_data['words_list_id'] = words_list_id;
+            $.post({
+                type: 'POST',
+                url: '/sync',
+                data: JSON.stringify(sync_data),
+                contentType: "application/json",
+                dataType: 'json'}
+            )
+                .done(function(data) {
+                    for (const id of data) {
+                        $("#" + id).addClass('disabled');
+                        $("#" + id).addClass('amber');
+                        $("#" + id).addClass('lighten-4');
+                    }
+                })
+        }
+
+        function triggerModal(id) {
+            console.log(id);
+            $("#"+ id).modal();
+        }
+    </script>
+    </body>
+</html>

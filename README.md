@@ -27,3 +27,7 @@ The next texts were selected for processing:
 * custom_stopwords.txt - not relevant words, usually foreign, mistakes so on. Need to be excluded from index.
 * excluded_words.txt - words which should not be part of the index because, for example, user already knows them.
 * lemmas.csv - forms of one word.
+
+### Links:
+https://github.com/oroszgy/spacy-hungarian-models
+https://github.com/oroszgy/hungarian-text-mining-workshop
