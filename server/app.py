@@ -21,9 +21,9 @@ CORS(app,
 
 CONFIG = Config(app, db)
 
-# if os.getenv('RECREATE_DB') in ['True', 'true']:
-CONFIG.db.drop_all(app=app)
-CONFIG.db.create_all(app=app)
+if os.getenv('RECREATE_DB') in ['True', 'true']:
+    CONFIG.db.drop_all(app=app)
+    CONFIG.db.create_all(app=app)
 
 
 @app.route('/list/<words_list_id>', methods=['GET'])
@@ -115,6 +115,10 @@ def get_words_lists():
     words_lists = WordsList.query.all()
     return render_template('words-lists.html', words_lists=words_lists)
 
+
+@app.route('/cards', methods=['GET'])
+def get_cards():
+    return render_template('cards.html')
 
 
 app.config['env_config'] = CONFIG

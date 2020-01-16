@@ -65,7 +65,7 @@ class Config:
 def build_connection_url(user, password, host, dbname):
     # if os.getenv('MYSQL_DATABASE_CONNECTION'):
     port = 3306
-    return f'mysql+mysqlconnector://{user}:{password}@{host}:{port}/{dbname}'
-    # return f'mysql+pymysql://{user}:{password}@{host}:{port}/{dbname}?auth_plugin=mysql_native_password'
+    # return f'mysql+mysqlconnector://{user}:{password}@{host}:{port}/{dbname}'
+    return f'mysql+pymysql://{user}:{password}@{host}:{port}/{dbname}'
     # port = 5432
     # return f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}'
