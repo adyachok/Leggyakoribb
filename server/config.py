@@ -35,7 +35,7 @@ class Config:
     def _init_db(self, app):
         DATABASE_NAME = os.getenv('DATABASE_NAME')
         if not DATABASE_NAME:
-            DATABASE_NAME = 'legyakoribb'
+            DATABASE_NAME = 'leggyakoribb'
 
         DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
         if not DATABASE_PASSWORD:
@@ -57,13 +57,15 @@ class Config:
             DATABASE_USERNAME,
             DATABASE_PASSWORD,
             DATABASE_HOST,
-            5432,
             DATABASE_NAME)
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         self.db.init_app(app)
 
 
-def build_connection_url(user, password, host, port, dbname):
-    if os.getenv('MYSQL_DATABASE_CONNECTION'):
-        return f'mysql+mysqlconnector://{user}:{password}@{host}:{port}/{dbname}'
-    return f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}'
+def build_connection_url(user, password, host, dbname):
+    # if os.getenv('MYSQL_DATABASE_CONNECTION'):
+    port = 3306
+    return f'mysql+mysqlconnector://{user}:{password}@{host}:{port}/{dbname}'
+    # return f'mysql+pymysql://{user}:{password}@{host}:{port}/{dbname}?auth_plugin=mysql_native_password'
+    # port = 5432
+    # return f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}'

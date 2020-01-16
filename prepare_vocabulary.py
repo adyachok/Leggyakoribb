@@ -28,25 +28,31 @@ with open('books/magyar-ukran-szotar_processed.txt', 'r') as so:
 
 
 
-import psycopg2
+# import psycopg2
+#
+#
+# conn = psycopg2.connect("host=localhost dbname=legyakoribb user=testu password=testp")
+#
+# cur = conn.cursor()
 
+import pymysql
 
-conn = psycopg2.connect("host=localhost dbname=legyakoribb user=testu password=testp")
-
+conn = pymysql.connect(
+  host="localhost",
+  user="testu",
+  passwd="testp",
+  database="leggyakoribb"
+)
 cur = conn.cursor()
-
-# import mysql.connector
-
-# conn = mysql.connector.connect(
-#   host="localhost",
-#   user="yourusername",
-#   passwd="yourpassword"
-# )
-
 
 # cur.execute("DROP TABLE IF EXISTS hu_ua_dictionary;")
 # cur.execute("CREATE TABLE hu_ua_dictionary (id serial PRIMARY KEY, hu_szo varchar, ua_szo varchar);")
-cur.execute(f"""INSERT INTO words_lists(name, description) VALUES ('HU UA Dictionary', 'Hungarian-Ukrainian dictionary with 5000 words.')""")
+cur.execute("SELECT id FROM words_lists WHERE name='HU UA Dictionary'")
+res = cur.fetchone()
+print(res)
+
+# cur.execute(f"""INSERT INTO words_lists(name, description) VALUES ('HU UA Dictionary', 'Hungarian-Ukrainian dictionary with 5000 words.')""")
+# conn.commit()
 for word in words:
     if len(word) < 2:
         print(word)
@@ -56,7 +62,7 @@ for word in words:
            (
               '{word[0]}',
               '{word[1]}',
-              1
+              3
            );""")
 cur.execute(f"""INSERT INTO users(email, password) VALUES ('atti.dyachok@gmail.com', '12345')""")
 cur.execute(f"""INSERT INTO users(email, password) VALUES ('vira.dyachok@gmail.com', '12345')""")

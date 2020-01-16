@@ -8,7 +8,7 @@ from flask_cors import CORS
 from sqlalchemy import and_
 
 from server.config import Config
-from server.models import db, WordLearningProgress, User, Word
+from server.models import db, WordLearningProgress, User, Word, WordsList
 
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
@@ -21,13 +21,13 @@ CORS(app,
 
 CONFIG = Config(app, db)
 
-if os.getenv('RECREATE_DB') in ['True', 'true']:
-    CONFIG.db.drop_all(app=app)
-    CONFIG.db.create_all(app=app)
+# if os.getenv('RECREATE_DB') in ['True', 'true']:
+CONFIG.db.drop_all(app=app)
+CONFIG.db.create_all(app=app)
 
 
-@app.route('/', methods=['GET'])
-def hello():
+@app.route('/list/<words_list_id>', methods=['GET'])
+def hello(words_list_id):
     email = session.get('user')
     if not email:
         return redirect('/login', code=302)
@@ -35,7 +35,7 @@ def hello():
     if not user:
         return redirect('/login', code=302)
     next_from = request.args.get('next_from')
-    words_list_id = request.args.get('words_list')
+    # words_list_id = request.args.get('words_list')
     result = []
     progress = []
     if next_from and words_list_id:
@@ -102,6 +102,19 @@ def sync():
         except ValueError as e:
             print(e)
     return jsonify(list(words_data.keys()))
+
+
+@app.route('/', methods=['GET'])
+def get_words_lists():
+    email = session.get('user')
+    if not email:
+        return redirect('/login', code=302)
+    user = User.query.filter(User.email == email).first()
+    if not user:
+        return redirect('/login', code=302)
+    words_lists = WordsList.query.all()
+    return render_template('words-lists.html', words_lists=words_lists)
+
 
 
 app.config['env_config'] = CONFIG

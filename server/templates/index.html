@@ -11,6 +11,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.core.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <style>
             .progress_bar {
                 height: 1rem;
@@ -147,7 +148,9 @@
                         $("#" + id).addClass('disabled');
                         $("#" + id).addClass('amber');
                         $("#" + id).addClass('lighten-4');
+                        delete processed_ids[id];
                     }
+                    console.log(processed_ids);
                 })
         }
 
