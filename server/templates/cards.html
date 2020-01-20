@@ -12,33 +12,98 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.core.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        .translation-select-action {
+            padding: 0.4rem;
+        }
+        html, body
+        {
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="padding-top: 20%">
 
-        <div class="row">
-            <div class="col s12 l4 m6">
-              <div class="card blue-grey darken-1">
-                <div class="card-content white-text">
-                  <span class="card-title center-align">Card Title</span>
+        <div class="row carousel carousel-slider center">
+            {% for quest_word in quest_words %}
+                <div class="col s12 l4 m6 translation-card-container carousel-item">
+                  <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                      <span class="card-title center-align" style="font-size: xx-large">{{ quest_word.foreign_name }}</span>
+                    </div>
+                    <div class="card-action">
+                        {% for translation in quest_word.shuffled_translations %}
+                            <div class="left-align translation-select-action">
+                                <a href="#" class="translation" data-foreign-name="{{ quest_word.foreign_name }}" data-right="{% if quest_word.translations[translation] %}true{% else %}false{% endif %}">{{ translation }}</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                  </div>
                 </div>
-                <div class="card-action">
-                    <div class="center-align">
-                        <a href="#">This is a link</a>
-                    </div>
-                    <div class="center-align">
-                        <a href="#" >This is a link</a>
-                    </div>
-                    <div class="center-align">
-                        <a href="#">This is a link</a>
-                    </div>
-                    <div class="center-align">
-                        <a href="#" >This is a link</a>
-                    </div>
-                </div>
-              </div>
-            </div>
+            {% endfor %}
+            <div class="carousel-fixed-item center"></div>
+        </div>
+
+
+        <div class="progress">
+          <div class="determinate" style="width:0%"></div>
+        </div>
+
+        <div>
+            <p class="center-align">success score: <span id="success">0</span>%</p>
         </div>
     </div>
+
+
+
+    <script type="text/javascript">
+        const result = {},
+            cards_total = {{ quest_words|length }};
+
+        function processSelectedOption(event) {
+            const target = event.target,
+             is_right = $(target).attr("data-right") === 'true' ? true : false,
+             foreign_name = $(target).attr("data-foreign-name");
+
+            // Unbinding enent listeners
+            $(target).unbind('click');
+            $(target).parent().siblings().find('a').unbind('click');
+            $(target).parent().siblings().find('a').css('color', 'gray');
+
+            // Change CSS
+            $(target).closest(".card").removeClass("blue-grey");
+            $(target).closest(".card").removeClass("darken-1");
+            if (is_right) {
+                // Mark card with light-green-color
+                $(target).closest(".card").addClass("teal");
+                $(target).closest(".card").addClass("darken-2");
+                $(target).css("color", "#b2dfdb");
+                result[foreign_name] = true;
+                $("#success").text(function(){
+                    const values = _.values(result);
+                    const true_values = _.filter(values, (v) => v === true);
+                    const success =  true_values.length / cards_total * 100;
+                    return success.toFixed(1)
+                }());
+            } else {
+                $(target).closest(".card").addClass("grey");
+                $(target).closest(".card").addClass("darken-2");
+                $(target).css("color", "#ff8a65");
+                result[foreign_name] = false;
+            }
+            $(".determinate").css('width', "" + (_.size(result) / cards_total * 100) + "%");
+            // $(target).closest(".card").find('.card-content').removeClass("white-text");
+            // $(target).closest(".card").find('.card-content').addClass("black-text");
+            if (_.size(result) === cards_total) {
+                // console.log("SUBMIT!!!!!")
+            }
+        }
+        $(".translation").bind('click', processSelectedOption);
+        $('.carousel.carousel-slider').carousel({
+            fullWidth: true,
+            indicators: true
+          });
+    </script>
 </body>
 </html>

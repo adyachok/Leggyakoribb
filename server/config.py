@@ -26,7 +26,7 @@ class Config:
     def _init_service_port(self):
         self.SERVICE_PORT = os.getenv('SERVICE_PORT')
         if not self.SERVICE_PORT:
-            self.SERVICE_PORT = 8888
+            self.SERVICE_PORT = 8889
 
     def _init_service_debug(self):
         env_var = os.getenv('SERVICE_DEBUG')

@@ -1,6 +1,7 @@
 import datetime
 import os
 import logging
+import random
 
 from flask import Flask, escape, request, jsonify, render_template, redirect, \
     session, abort
@@ -118,7 +119,35 @@ def get_words_lists():
 
 @app.route('/cards', methods=['GET'])
 def get_cards():
-    return render_template('cards.html')
+    email = session.get('user')
+    if not email:
+        return redirect('/login', code=302)
+    learned_words = WordLearningProgress.query.limit(20).all()
+    all_words = Word.query.with_entities(Word.ua_szo).limit(80).all()
+    all_words = [result[0] for result in all_words]
+    quest_words = []
+    for progress in learned_words:
+        quest_word = {}
+        quest_word['foreign_name'] = progress.word.hu_szo
+        words = dict()
+        # Have to add the right translation option
+        true_translation = progress.word.ua_szo
+        words[true_translation] = True
+        while True:
+            if len(words) == 4:
+                break
+            rand = random.randint(0, len(all_words) - 1)
+            false_translation = all_words[rand]
+            if false_translation == true_translation:
+                continue
+            else:
+                words[false_translation] = False
+        quest_word['translations'] = words
+        shuffled_translations = list(words.keys())
+        random.shuffle(shuffled_translations)
+        quest_word['shuffled_translations'] = shuffled_translations
+        quest_words.append(quest_word)
+    return render_template('cards.html', quest_words=quest_words)
 
 
 app.config['env_config'] = CONFIG
